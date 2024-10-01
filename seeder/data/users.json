@@ -1,0 +1,21 @@
+[
+    {
+      "name": "First Admin",
+      "email": "admin@test.com",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "name": "Mocking Bird",
+      "email": "mocking@bird.com",
+      "password": "user123",
+      "role": "user"
+    },
+    {
+      "name": "Kill Bill",
+      "email": "kill@bill.com",
+      "password": "kill123",
+      "role": "user"
+    }
+  ]
+  

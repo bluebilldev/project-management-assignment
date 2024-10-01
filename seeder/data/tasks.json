@@ -1,0 +1,219 @@
+[
+    {
+      "title": "Setup Bambu X1",
+      "description": "Calibrate and setup Bambu X1",
+      "status": "Completed",
+      "dueDate": "2024-10-01",
+      "priority": "High", 
+      "projectIndex": 0,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Print Benchy",
+      "description": "Print a simple benchy",
+      "status": "In Progress",
+      "dueDate": "2024-09-01",
+      "priority": "Medium", 
+      "projectIndex": 0,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Order PLA Filaments",
+      "description": "Place an order for Red, Green, Beige PLA Filaments",
+      "status": "To Do",
+      "dueDate": "2024-10-15",
+      "priority": "High", 
+      "projectIndex": 0,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Finalize 3D Models",
+      "description": "Complete final designs for project1",
+      "status": "To Do",
+      "dueDate": "2024-11-10",
+      "priority": "Low", 
+      "projectIndex": 0,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Print Components",
+      "description": "3D print all necessary components for project1",
+      "status": "To Do",
+      "dueDate": "2024-11-20",
+      "priority": "Medium", 
+      "projectIndex": 0,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Assemble Project1",
+      "description": "Assemble all components of project1",
+      "status": "To Do",
+      "dueDate": "2024-12-05",
+      "priority": "Low", 
+      "projectIndex": 0,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Test Project1",
+      "description": "Perform functionality tests on project1",
+      "status": "To Do",
+      "dueDate": "2024-12-10",
+      "priority": "Medium", 
+      "projectIndex": 0,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Prepare Documentation",
+      "description": "Document the development process of project1",
+      "status": "To Do",
+      "dueDate": "2024-12-15",
+      "priority": "Low", 
+      "projectIndex": 0,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Design RC Car Frame",
+      "description": "Create 3D model for the RC car frame",
+      "status": "To Do",
+      "dueDate": "2025-01-10",
+      "priority": "High", 
+      "projectIndex": 1,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Source Electronics",
+      "description": "Acquire necessary electronics for the RC car",
+      "status": "In Progress",
+      "dueDate": "2025-01-20",
+      "priority": "Medium", 
+      "projectIndex": 1,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Assemble RC Car",
+      "description": "Build the RC car using 3D printed parts",
+      "status": "To Do",
+      "dueDate": "2025-02-10",
+      "priority": "Low", 
+      "projectIndex": 1,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Test RC Car",
+      "description": "Perform functionality tests on RC car",
+      "status": "To Do",
+      "dueDate": "2025-02-15",
+      "priority": "Medium", 
+      "projectIndex": 1,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Finalize RC Car Design",
+      "description": "Make final adjustments to RC car design",
+      "status": "In Progress",
+      "dueDate": "2025-02-20",
+      "priority": "High", 
+      "projectIndex": 1,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Optimize Electronics Setup",
+      "description": "Improve electronics configuration for better performance",
+      "status": "To Do",
+      "dueDate": "2025-02-25",
+      "priority": "Medium", 
+      "projectIndex": 1,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Create Assembly Guide",
+      "description": "Document assembly steps for RC car",
+      "status": "To Do",
+      "dueDate": "2025-02-28",
+      "priority": "Low", 
+      "projectIndex": 1,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Market RC Car",
+      "description": "Start marketing campaign for RC car",
+      "status": "To Do",
+      "dueDate": "2025-03-05",
+      "priority": "Medium", 
+      "projectIndex": 1,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Design iPhone Dock",
+      "description": "Create 3D model for the iPhone dock",
+      "status": "Completed",
+      "dueDate": "2025-01-05",
+      "priority": "High", 
+      "projectIndex": 2,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Select Materials",
+      "description": "Choose appropriate materials for the iPhone dock",
+      "status": "In Progress",
+      "dueDate": "2025-01-15",
+      "priority": "Medium", 
+      "projectIndex": 2,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "3D Print Dock",
+      "description": "Print the iPhone dock using selected materials",
+      "status": "To Do",
+      "dueDate": "2025-02-01",
+      "priority": "High", 
+      "projectIndex": 2,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Test Dock Functionality",
+      "description": "Ensure the iPhone dock works as intended",
+      "status": "To Do",
+      "dueDate": "2025-02-10",
+      "priority": "Medium", 
+      "projectIndex": 2,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Finalize Dock Design",
+      "description": "Make final adjustments to iPhone dock design",
+      "status": "To Do",
+      "dueDate": "2025-02-15",
+      "priority": "Medium", 
+      "projectIndex": 2,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Create Packaging Design",
+      "description": "Design packaging for the iPhone dock",
+      "status": "In Progress",
+      "dueDate": "2025-02-20",
+      "priority": "Low", 
+      "projectIndex": 2,
+      "assignedToIndex": 2
+    },
+    {
+      "title": "Prepare Marketing Materials",
+      "description": "Develop marketing materials for the dock",
+      "status": "To Do",
+      "dueDate": "2025-02-25",
+      "priority": "Medium", 
+      "projectIndex": 2,
+      "assignedToIndex": 1
+    },
+    {
+      "title": "Launch Dock Campaign",
+      "description": "Start the marketing campaign for the iPhone dock",
+      "status": "To Do",
+      "dueDate": "2025-03-01",
+      "priority": "Low", 
+      "projectIndex": 2,
+      "assignedToIndex": 2
+    }
+  ]
+  
