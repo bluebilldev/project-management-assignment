@@ -46,7 +46,7 @@ exports.createTask = async (req, res) => {
 
 // Get Tasks - Optional Params (by Project, by User, by Status)
 exports.getTasks = async (req, res) => {
-  const { project, user, status } = req.query;
+  const { project, user, status, startDate, endDate } = req.query;
 
   try {
 
@@ -63,6 +63,12 @@ exports.getTasks = async (req, res) => {
 
     if (status) {
       query.status = status;
+    }
+
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
     const tasks = await Task.find(query)
