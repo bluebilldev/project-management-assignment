@@ -29,14 +29,21 @@ jobs:
     # Build Docker image
     - name: 'Build Docker image'
       run: |
-        docker build -t assigmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }} .
+        docker build -t assignmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }} .
 
     # Log in to Azure Container Registry (ACR)
     - name: 'Log in to ACR'
       run: |
-        echo ${{ secrets.ACR_PASSWORD }} | docker login assigmentregistry.azurecr.io --username ${{ secrets.ACR_USERNAME }} --password-stdin
+        echo ${{ secrets.ACR_PASSWORD }} | docker login assignmentregistry.azurecr.io --username ${{ secrets.ACR_USERNAME }} --password-stdin
 
     # Push Docker image to ACR
     - name: 'Push Docker image to ACR'
       run: |
-        docker push assigmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }}
+        docker push assignmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }}
+
+    # Deploy the Docker image to Azure Web App Service
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'pmAssignment'
+        images: 'assignmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }}'
