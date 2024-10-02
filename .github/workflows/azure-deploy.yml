@@ -40,10 +40,3 @@ jobs:
     - name: 'Push Docker image to ACR'
       run: |
         docker push assignmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }}
-
-    # Deploy the Docker image to Azure Web App Service
-    - name: 'Deploy to Azure Web App'
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'pmAssignment'
-        images: 'assignmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }}'

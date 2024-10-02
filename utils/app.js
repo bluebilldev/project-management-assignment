@@ -33,6 +33,8 @@ function createServer() {
     app.use('/projects', require('../routes/projectRoutes'));
     app.use('/tasks', require('../routes/taskRoutes'));
 
+    
+
     // Error Handling Middleware
     app.use((err, req, res, next) => {
         console.error(err.stack);
