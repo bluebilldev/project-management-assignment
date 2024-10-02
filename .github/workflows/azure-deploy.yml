@@ -1,0 +1,49 @@
+name: Build and Deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v3
+
+    # Log in to Azure using the service principal (AZURE_CREDENTIALS secret)
+    - name: 'Log in to Azure'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # Install dependencies and run tests
+    - name: 'Install dependencies and run tests'
+      run: |
+        npm install
+        npm test
+
+    # Build Docker image
+    - name: 'Build Docker image'
+      run: |
+        docker build -t assigmentregistry.azurecr.io/pm-assigment-app:${{ github.sha }} .
+
+    # Log in to Azure Container Registry (ACR)
+    - name: 'Log in to ACR'
+      run: |
+        echo ${{ secrets.ACR_PASSWORD }} | docker login assigmentregistry.azurecr.io --username ${{ secrets.ACR_USERNAME }} --password-stdin
+
+    # Push Docker image to ACR
+    - name: 'Push Docker image to ACR'
+      run: |
+        docker push assigmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }}
+
+    # Deploy the Docker image to Azure Web App Service
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'pmAssignment'
+        images: 'assigmentregistry.azurecr.io/pm-assignment-app:${{ github.sha }}'
