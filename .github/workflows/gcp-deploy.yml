@@ -15,7 +15,7 @@ jobs:
 
     # Setup Google Cloud SDK
     - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@v1
       with:
         version: 'latest'
         project_id: ${{ secrets.GCLOUD_PROJECT }}
@@ -43,10 +43,10 @@ jobs:
 
     # Deploy to Cloud Run
     - name: Deploy to Cloud Run
-    run: |
-      gcloud run deploy assignment-app \
-        --image gcr.io/${{ secrets.GCLOUD_PROJECT }}/assignment-app \
-        --platform managed \
-        --region ${{ secrets.GCR_REGION }} \
-        --allow-unauthenticated \
-        --set-env-vars NODE_ENV=production
+      run: |
+        gcloud run deploy assignment-app \
+          --image gcr.io/${{ secrets.GCLOUD_PROJECT }}/assignment-app \
+          --platform managed \
+          --region ${{ secrets.GCR_REGION }} \
+          --allow-unauthenticated \
+          --set-env-vars NODE_ENV=production
