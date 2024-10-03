@@ -12,6 +12,12 @@ jobs:
     steps:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v3
+    
+    # Authenticate with Google Cloud
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
     # Setup Google Cloud SDK
     - name: Set up Cloud SDK
@@ -19,12 +25,6 @@ jobs:
       with:
         version: 'latest'
         project_id: ${{ secrets.GCLOUD_PROJECT }}
-        service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
-
-    # Set active account
-    - name: Set active account
-      run: |
-        gcloud config set account github-actions@${{ secrets.GCLOUD_PROJECT }}.iam.gserviceaccount.com
 
     # Verify Active Account (Check if the correct account is active)
     - name: Verify Active Account
