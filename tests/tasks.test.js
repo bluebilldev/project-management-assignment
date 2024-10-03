@@ -191,10 +191,12 @@ describe('Task Test Suite', () => {
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body.length).toBeGreaterThan(0);
         });
+    });
 
+    describe('Get tasks with groupBy conditions', () => {
         it('should list group tasks by user', async () => {
             const res = await supertest(app)
-                .get(`/tasks?groupBy=user`)
+                .get(`/tasks/groupedByUser`)
                 .set('Authorization', `Bearer ${authToken}`);
 
             expect(res.statusCode).toEqual(200);
@@ -209,7 +211,7 @@ describe('Task Test Suite', () => {
 
         it('should list group tasks by priority', async () => {
             const res = await supertest(app)
-                .get(`/tasks?groupBy=priority`)
+                .get(`/tasks/groupedByPriority`)
                 .set('Authorization', `Bearer ${authToken}`);
 
             expect(res.statusCode).toEqual(200);
@@ -221,7 +223,7 @@ describe('Task Test Suite', () => {
                 expect(result).toHaveProperty('priority');
             });
         });
-    });
+    })
 
     describe('Update a task', () => {
         it('should update a task status', async () => {

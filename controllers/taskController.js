@@ -48,7 +48,7 @@ exports.createTask = async (req, res) => {
 
 // Get Tasks - Optional Params (by Project, by User, by Status)
 exports.getTasks = async (req, res) => {
-  const { project, user, status, startDate, endDate, overdue, groupBy } = req.query;
+  const { project, user, status, startDate, endDate, overdue } = req.query;
 
   try {
 
@@ -86,11 +86,21 @@ exports.getTasks = async (req, res) => {
       query.status = { $in: ['In Progress', 'To Do'] }
     }
 
-    //Check if grouping is needed
-    let pipeline = [{ $match: query }];
+    const tasks = await Task.find(query)
+    res.json(tasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+};
 
-    //Group tasks by user or priority
-    if (groupBy === 'user') {
+// Get Tasks - Grouped By User
+exports.getTasksGroupedByUser = async (req, res) => {
+
+  try {
+    let pipeline = [];
+
+    //Group Users
       pipeline.push({
         $group: {
           _id: '$assignedUser',
@@ -98,6 +108,8 @@ exports.getTasks = async (req, res) => {
           count: { $sum: 1 }
         },
       })
+
+    //Lookup & Add User Details
       pipeline.push({
         $lookup: {
           from: 'users',
@@ -117,14 +129,31 @@ exports.getTasks = async (req, res) => {
           tasks: 1
         }
       })
-    } else if (groupBy === 'priority') {
+
+    const groupedTasks = await Task.aggregate(pipeline)
+    res.json(groupedTasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+};
+
+//Get Tasks - Grouped By Priority
+exports.getTasksGroupedByPriority = async (req, res) => {
+
+  try {
+    let pipeline = [];
+
+    //Group Users
       pipeline.push({
         $group: {
           _id: '$priority',
           tasks: { $push: '$$ROOT' },
           count: { $sum: 1 }
-        }
+        },
       })
+
+    //Add Priority Type
       pipeline.push(
       {
         $project : {
@@ -134,7 +163,6 @@ exports.getTasks = async (req, res) => {
           tasks: 1
         }
       })
-    }
 
     const groupedTasks = await Task.aggregate(pipeline)
     res.json(groupedTasks);

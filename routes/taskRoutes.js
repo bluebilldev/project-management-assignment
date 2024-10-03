@@ -3,7 +3,6 @@ const router = express.Router();
 const {
   createTask,
   getTasks,
-  getOverdueTasks,
   getTasksGroupedByUser,
   getTasksGroupedByPriority,
   updateTask,
@@ -16,6 +15,12 @@ router.post('/', protect, createTask);
 
 // @route   GET /api/tasks?
 router.get('/', protect, getTasks);
+
+// @route   GET /api/groupedByUser
+router.get('/groupedByUser', protect, getTasksGroupedByUser);
+
+// @route   GET /api/groupedByUser
+router.get('/groupedByPriority', protect, getTasksGroupedByPriority);
 
 // @route   PUT /api/tasks/:taskId
 router.put('/:taskId', protect, updateTask);
