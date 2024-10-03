@@ -19,7 +19,7 @@ jobs:
       with:
         version: 'latest'
         project_id: ${{ secrets.GCLOUD_PROJECT }}
-        service_account_key: ${{ secrets.SERVICEKEY }}
+        service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
     - name: Authenticate Docker with Google Cloud
       run: |
