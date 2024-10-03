@@ -8,7 +8,7 @@ const Project = require('../models/Project')
 const sampleTaskPayload = {
     title: 'Test Task 1',
     description: 'Add a test task to a project',
-    dueDate: '2024-12-20T00:00:00.000Z',
+    dueDate: '2024-09-20T00:00:00.000Z',
     status: "To Do",
     priority: "Medium",
     projectId: "",
@@ -20,7 +20,7 @@ const updateTaskStatusPayload = {
 }
 
 const updateTaskDueDatePayload = {
-    dueDate: "2024-12-22T00:00:00.000Z",
+    dueDate: "2024-10-22T00:00:00.000Z",
 }
 
 let app;
@@ -170,6 +170,56 @@ describe('Task Test Suite', () => {
             expect(res.statusCode).toEqual(200);
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body.length).toEqual(0);
+        });
+
+        it('should list tasks filtered by date range', async () => {
+            const res = await supertest(app)
+                .get(`/tasks?startDate=2024-10-01&endDate=2024-10-30`)
+                .set('Authorization', `Bearer ${authToken}`);
+
+            expect(res.statusCode).toEqual(200);
+            expect(Array.isArray(res.body)).toBe(true);
+            expect(res.body.length).toBeGreaterThan(0);
+        });
+
+        it('should list tasks overdue', async () => {
+            const res = await supertest(app)
+                .get(`/tasks?overdue=true`)
+                .set('Authorization', `Bearer ${authToken}`);
+
+            expect(res.statusCode).toEqual(200);
+            expect(Array.isArray(res.body)).toBe(true);
+            expect(res.body.length).toBeGreaterThan(0);
+        });
+
+        it('should list group tasks by user', async () => {
+            const res = await supertest(app)
+                .get(`/tasks?groupBy=user`)
+                .set('Authorization', `Bearer ${authToken}`);
+
+            expect(res.statusCode).toEqual(200);
+            expect(Array.isArray(res.body)).toBe(true);
+            expect(res.body.length).toBeGreaterThan(0);
+            res.body.forEach(result => {
+                expect(result).toHaveProperty('tasks');
+                expect(result).toHaveProperty('count');
+                expect(result).toHaveProperty('name');
+            });
+        });
+
+        it('should list group tasks by priority', async () => {
+            const res = await supertest(app)
+                .get(`/tasks?groupBy=priority`)
+                .set('Authorization', `Bearer ${authToken}`);
+
+            expect(res.statusCode).toEqual(200);
+            expect(Array.isArray(res.body)).toBe(true);
+            expect(res.body.length).toBeGreaterThan(0);
+            res.body.forEach(result => {
+                expect(result).toHaveProperty('tasks');
+                expect(result).toHaveProperty('count');
+                expect(result).toHaveProperty('priority');
+            });
         });
     });
 

@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 const Task = require('../models/Task');
 const Project = require('../models/Project');
 
@@ -46,7 +48,7 @@ exports.createTask = async (req, res) => {
 
 // Get Tasks - Optional Params (by Project, by User, by Status)
 exports.getTasks = async (req, res) => {
-  const { project, user, status, startDate, endDate } = req.query;
+  const { project, user, status, startDate, endDate, overdue, groupBy } = req.query;
 
   try {
 
@@ -54,11 +56,19 @@ exports.getTasks = async (req, res) => {
     const query = {};
 
     if (project) {
-      query.project = project;
+      if (ObjectId.isValid(project) && typeof project === 'string') {
+        query.project = new ObjectId(project);
+      } else {
+        return res.status(400).json({ message: 'Invalid Project Id' });
+      }
     }
 
     if (user) {
-      query.assignedUser = user;
+      if (ObjectId.isValid(user) && typeof user === 'string') {
+        query.assignedUser = new ObjectId(user);
+      } else {
+        return res.status(400).json({ message: 'Invalid User Id' });
+      }
     }
 
     if (status) {
@@ -71,13 +81,69 @@ exports.getTasks = async (req, res) => {
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
-    const tasks = await Task.find(query)
-    res.json(tasks);
+    if (overdue === 'true') {
+      query.dueDate = { $lt: new Date() };
+      query.status = { $in: ['In Progress', 'To Do'] }
+    }
+
+    //Check if grouping is needed
+    let pipeline = [{ $match: query }];
+
+    //Group tasks by user or priority
+    if (groupBy === 'user') {
+      pipeline.push({
+        $group: {
+          _id: '$assignedUser',
+          tasks: { $push: '$$ROOT' },
+          count: { $sum: 1 }
+        },
+      })
+      pipeline.push({
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'userDetails'
+        }
+      }, 
+      {
+        $unwind: '$userDetails'
+      }, 
+      {
+        $project : {
+          _id: 0, 
+          name: '$userDetails.name', 
+          count: 1,
+          tasks: 1
+        }
+      })
+    } else if (groupBy === 'priority') {
+      pipeline.push({
+        $group: {
+          _id: '$priority',
+          tasks: { $push: '$$ROOT' },
+          count: { $sum: 1 }
+        }
+      })
+      pipeline.push(
+      {
+        $project : {
+          _id: 0, 
+          priority: '$_id', 
+          count: 1,
+          tasks: 1
+        }
+      })
+    }
+
+    const groupedTasks = await Task.aggregate(pipeline)
+    res.json(groupedTasks);
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
   }
 };
+
 
 // Update Task
 exports.updateTask = async (req, res) => {
