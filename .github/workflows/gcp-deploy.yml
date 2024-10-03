@@ -1,4 +1,4 @@
-name: Build and Deploy to Azure
+name: Build and Deploy to Google Cloud
 
 on:
   push:
@@ -23,7 +23,12 @@ jobs:
 
     - name: Authenticate Docker with Google Cloud
       run: |
-        gcloud auth configure-docker
+        gcloud auth configure-docker gcr.io
+
+    # Debug Docker Authentication    
+    - name: Debug Docker Authentication
+      run: |
+        cat ~/.docker/config.json
 
     # Install dependencies and run tests
     - name: 'Install dependencies and run tests'
