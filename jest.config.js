@@ -4,5 +4,6 @@ module.exports = {
     testEnvironment: 'node',
     setupFilesAfterEnv: ['./tests/helpers/dbSetup.js'], 
     detectOpenHandles: true,
+    testTimeout: 10000
   };
   

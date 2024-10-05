@@ -25,10 +25,6 @@ let userId;
 
 describe('User Profile Test Suite', () => {
     beforeAll(async () => {
-        // Set JWT secret and expiration for test environment
-        process.env.JWT_SECRET = 'testsecretsauce';
-        process.env.JWT_EXPIRE = '1h';
-
         app = createServer();
 
     });
@@ -55,7 +51,7 @@ describe('User Profile Test Suite', () => {
             expect(res.body).toHaveProperty('message', 'User already exists');
         });
 
-        it('should log in with the registered user', async () => {
+        it('should log in with the newly registered user', async () => {
             const res = await supertest(app)
                 .post('/auth/login')
                 .send(userLoginPayload);

@@ -7,21 +7,26 @@ const rateLimit = require('express-rate-limit');
 
 //Setting 15 Min Rate Limiter
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 50, 
+  windowMs: 15 * 60 * 1000,
+  max: 50,
   message: 'Too many authentication attempts from this IP, try again after 15 Mins'
 });
 
 router.use(authLimiter);
 
+const loginValidation =
+  [
+    check('email', 'Please include a valid email').isEmail(),
+    check('password', 'Password is required').exists(),
+  ]
 
-router.post('/login', [
-  check('email', 'Please include a valid email').isEmail(),
-  check('password', 'Password is required').exists(),
-], (req, res) => {
+router.post('/login', loginValidation, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const formattedErrors = errors.array().map(error => {
+      return { message: error.msg };
+    });
+    return res.status(400).json({ errors: formattedErrors });
   }
   loginUser(req, res);
 });

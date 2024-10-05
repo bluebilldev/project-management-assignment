@@ -83,7 +83,7 @@ npm start
 docker build -t pm_assigment .
 ```
 
-**Using Environment Variables**: 
+**Using Environment Variables**:
 
 Create a `.env.test.local` file at the root of the project and add the following environment variables:
 
@@ -121,7 +121,8 @@ Test coverage includes:
 
 ## Architecture Overview
 
-The project follows a **Model-Controller-Route (MCR)** architecture, where business logic is separated into models, controllers handle the logic, and routes define the API endpoints. Below is an overview of the key models, their relationships, and other architectural elements.
+The project follows a **Model-Controller-Route (MCR)** architecture, where business logic is separated into models, controllers handle the logic, and routes define the API endpoints. 
+Below is an overview of the key models, their relationships, and other architectural elements.
 
 ### Models
 
@@ -166,12 +167,13 @@ The project follows a **Model-Controller-Route (MCR)** architecture, where busin
 ### Relationships Between Models
 
 - **User-Project Relationship**:
-  - A user can own multiple projects and be a member of multiple projects.
+  - A user can be a member of multiple projects.
   - A project is owned by a single user (the admin) but can have multiple members (regular users).
 
 - **User-Task Relationship**:
   - A user can be assigned multiple tasks.
   - Tasks are assigned to a single user, but users can have multiple tasks in various projects.
+  - Tasks can be updated either by the assignedUser or the owner of the project (admin)
 
 - **Project-Task Relationship**:
   - A project can have multiple tasks.
@@ -182,14 +184,15 @@ The project follows a **Model-Controller-Route (MCR)** architecture, where busin
 - **Controllers**:
   - The business logic is handled in controllers, such as creating users, assigning tasks, updating projects, and handling authentication.
   - For example:
-    - `authController.js` handles user authentication (login, registration, token generation).
+    - `authController.js` handles user authentication (login, token generation).
     - `projectController.js` manages CRUD operations for projects.
     - `taskController.js` handles task creation, assignment, and updates.
+    - `userController.js` handles user registration (registration, profile updates).
 
 - **Routes**:
   - The API routes are organized based on the resource they manage, e.g., users, projects, and tasks.
   - Examples of routes include:
-    - `POST /auth/register` – Register a new user.
+    - `POST /users` – Register a new user.
     - `PUT /users/:id` – Update user details.
     - `POST /projects` – Create a new project.
     - `GET /tasks/:id` – Retrieve details of a specific task.
@@ -205,7 +208,7 @@ The project follows a **Model-Controller-Route (MCR)** architecture, where busin
 ### Security and Scalability
 
 - **Security**:
-  - Passwords are hashed using `bcrypt` before being stored in the database.
+  - Passwords are hashed using `bcryptjs` before being stored in the database.
   - JWT tokens are used for stateless authentication, and sensitive routes are protected using authorization middleware.
   - Additional security is provided through `helmet` for HTTP header security and `express-rate-limit` to prevent brute-force attacks.
 

@@ -33,12 +33,13 @@ function createServer() {
     app.use('/projects', require('../routes/projectRoutes'));
     app.use('/tasks', require('../routes/taskRoutes'));
 
-    
+
 
     // Error Handling Middleware
-    app.use((err, req, res, next) => {
-        console.error(err.stack);
-        res.status(500).send('Something broke!');
+    app.use((req, res, next) => {
+        res.status(404).json({
+            message: 'The endpoint you are trying to access does not exist'
+        });
     });
 
     return app
