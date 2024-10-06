@@ -60,7 +60,7 @@ describe('Task Test Suite', () => {
 
         // Retrieve tasks
         const task1 = await Task.findOne({ title: 'Test Task 2' })
-        const task2 = await Task.findOne({ title: 'Test Task 4' })
+        const task2 = await Task.findOne({ title: 'Test Task 15' })
 
         taskId1 = task1._id.toString();
         taskId2 = task2._id.toString();
@@ -293,6 +293,32 @@ describe('Task Test Suite', () => {
             expect(res.statusCode).toEqual(400);
             expect(res.body.errors[0].message).toBe('Overdue must be a boolean value');
         });
+
+        it('should list all tasks without filters & pagination', async () => {
+            const res = await supertest(app)
+                .get('/tasks')
+                .set('Authorization', `Bearer ${adminToken}`);
+
+            expect(res.statusCode).toEqual(200);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page', 1);
+            expect(res.body).toHaveProperty('pages', 2);
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
+        });
+
+        it('should list all tasks with pagination', async () => {
+            const res = await supertest(app)
+                .get('/tasks?page=2&limit=10')
+                .set('Authorization', `Bearer ${adminToken}`);
+
+            expect(res.statusCode).toEqual(200);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page', 2);
+            expect(res.body).toHaveProperty('pages', 2);
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
+        });
     });
 
     describe('Get tasks with optional filters - Admin', () => {
@@ -302,8 +328,11 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
         });
 
         it('should list tasks filtered by project', async () => {
@@ -312,9 +341,12 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
-            res.body.forEach(task => {
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
+            res.body.tasks.forEach(task => {
                 expect(task.project).toEqual(projectId1);
             });
         });
@@ -325,9 +357,12 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
-            res.body.forEach(task => {
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
+            res.body.tasks.forEach(task => {
                 expect(task.assignedUser).toEqual(user1._id.toString());
             });
         });
@@ -338,9 +373,12 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
-            res.body.forEach(task => {
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
+            res.body.tasks.forEach(task => {
                 expect(task.status).toEqual('To Do');
             });
         });
@@ -351,9 +389,12 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
-            res.body.forEach(task => {
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
+            res.body.tasks.forEach(task => {
                 expect(task.project).toEqual(projectId1);
                 expect(task.assignedUser).toEqual(user1._id.toString());
                 expect(task.status).toEqual('To Do');
@@ -366,8 +407,11 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toEqual(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toEqual(0);
         });
 
         it('should list tasks filtered by date range', async () => {
@@ -376,8 +420,11 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
         });
 
         it('should list tasks overdue', async () => {
@@ -386,8 +433,11 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
         });
     });
 
@@ -398,8 +448,11 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${userToken1}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
         });
 
         it('should list tasks filtered by project', async () => {
@@ -408,9 +461,12 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${userToken1}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
-            res.body.forEach(task => {
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toBeGreaterThan(0);
+            res.body.tasks.forEach(task => {
                 expect(task.project).toEqual(projectId1.toString());
             });
         });
@@ -421,7 +477,11 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${userToken1}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(res.body.length).toEqual(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            expect(res.body.tasks.length).toEqual(0);
         });
 
         it('should list tasks filtered by user', async () => {
@@ -430,9 +490,11 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${userToken1}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
-            res.body.forEach(task => {
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            res.body.tasks.forEach(task => {
                 expect(task.assignedUser).toEqual(user1._id.toString());
             });
         });
@@ -443,9 +505,11 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${userToken1}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
-            res.body.forEach(task => {
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
+            res.body.tasks.forEach(task => {
                 expect(task.status).toEqual('To Do');
             });
         });
@@ -456,8 +520,10 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${userToken1}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toEqual(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
         });
 
         it('should list tasks filtered by date range', async () => {
@@ -466,8 +532,10 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${userToken1}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
         });
 
         it('should list tasks overdue', async () => {
@@ -476,8 +544,10 @@ describe('Task Test Suite', () => {
                 .set('Authorization', `Bearer ${userToken1}`);
 
             expect(res.statusCode).toEqual(200);
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body.length).toBeGreaterThan(0);
+            expect(res.body).toHaveProperty('total');
+            expect(res.body).toHaveProperty('page');
+            expect(res.body).toHaveProperty('pages');
+            expect(Array.isArray(res.body.tasks)).toBe(true);
         });
     });
 

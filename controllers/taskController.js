@@ -70,7 +70,7 @@ exports.createTask = async (req, res) => {
 
 // Get Tasks - Optional Params (by Project, by User, by Status)
 exports.getTasks = async (req, res) => {
-  const { project, user, status, startDate, endDate, overdue, priority } = req.query;
+  const { page = 1, limit = 10, project, user, status, startDate, endDate, overdue, priority } = req.query;
 
   try {
 
@@ -119,7 +119,17 @@ exports.getTasks = async (req, res) => {
     }
 
     const tasks = await Task.find(query)
-    res.json(tasks);
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit))
+      .sort({ dueDate: 1 })
+
+    const total = await Task.countDocuments(query)
+
+    res.json({
+      total, page: parseInt(page),
+      pages: Math.ceil(total / limit),
+      tasks
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
