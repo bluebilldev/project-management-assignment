@@ -62,6 +62,11 @@ exports.createTask = async (req, res) => {
     });
 
     await task.save();
+
+    //Invalidate the cached task list
+    const redisKeyPattern = 'tasks:*';
+    await redisClient.del(redisKeyPattern);
+
     res.status(201).json(task);
   } catch (error) {
     console.error(error);
@@ -130,14 +135,16 @@ exports.getTasks = async (req, res) => {
     const total = await Task.countDocuments(query);
 
 
-    // Set-up Cache the result for 1 hour
-    try {
-      await redisClient.setEx(redisKey, 3600, JSON.stringify({ total, page, pages: Math.ceil(total / limit), tasks }));
-    } catch (error) {
-      if (error.message.includes('MISCONF')) {
-        console.warn('Redis write failed due to persistence issue, skipping cache.');
-      } else {
-        console.error('Error caching response:', error);
+    // Set-up Cache the result for 1 hour, but skip if NODE_ENV is 'test'
+    if (process.env.NODE_ENV !== 'test') {
+      try {
+        await redisClient.setEx(redisKey, 3600, JSON.stringify({ total, page, pages: Math.ceil(total / limit), tasks }));
+      } catch (error) {
+        if (error.message.includes('MISCONF')) {
+          console.warn('Redis write failed due to persistence issue, skipping cache.');
+        } else {
+          console.error('Error caching response:', error);
+        }
       }
     }
 
@@ -261,6 +268,11 @@ exports.updateTask = async (req, res) => {
     if (assignedUser) task.assignedUser = assignedUser;
 
     await task.save();
+
+    //Invalidate the cached task list
+    const redisKeyPattern = 'tasks:*';
+    await redisClient.del(redisKeyPattern);
+
     res.json(task);
   } catch (error) {
     console.error(error);

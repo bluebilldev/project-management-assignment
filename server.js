@@ -9,11 +9,6 @@ dotenv.config();
 // Connect to database
 connectDB();
 
-//Connect to Redis
-(async () => {
-    await connectRedis();
-  })();
-
 const app = createServer();
 
 //Health Check Route for Cloud Deployments

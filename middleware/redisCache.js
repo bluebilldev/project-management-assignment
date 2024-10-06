@@ -8,8 +8,13 @@ const redisCache = async (req, res, next) => {
 
     try {
 
+        // Disable for test
+        if (process.env.NODE_ENV === 'test') {
+            return next();
+        }
+
         //Check Redis Connection
-        if (!redisClient.isReady) {
+        if (!redisClient.isOpen) {
             console.log('Redis Connected again!');
             await connectRedis();
         }
@@ -25,7 +30,7 @@ const redisCache = async (req, res, next) => {
             next();
         }
     } catch (error) {
-        console.log('Redis connection error:', error.message);
+        console.log('Redis connection error:', error);
         next();
     }
 };

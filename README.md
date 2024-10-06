@@ -7,11 +7,13 @@
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
+- [Redis Setup](#redis-setup)
 - [Seeding the Database](#seeding-the-database)
 - [Running the Application](#running-the-application)
 - [Running the Application with Docker](#running-the-application-with-docker)
 - [Testing](#testing)
 - [Architecure Overview](#architecture-overview)
+- [Horizontal Scaling](#horizontal-scaling)
 
 ## Introduction
 
@@ -46,22 +48,48 @@ A robust and scalable User, Task, and Project Management System built with Node.
    ```bash
    git clone https://github.com/yourusername/project-management-system.git
    cd project-management-system
+   ```
 
 2. **Install Dependencies**
 
    ```bash
    npm i
+   ```
 
 ## Environment Variables
 
-Create a `.env` file at the root of the project and add the following environment variables:
+Create a `.env` file at the root of the project and configure your environment.
+You can use the .env.example as a template:
+
+  ```bash
+  cp .env.example .env
+  ```
 
    ```bash
    MONGO_URI=mongodb://localhost:27017/project_management
    JWT_SECRET=supersecretkey
    JWT_EXPIRE=1h
    PORT=7000
+   REDIS_HOST=localhost
+   REDIS_PORT=6379
+   REDIS_PASSWORD=   ## Leave empty for local redis
    ```
+
+## Redis Setup
+
+Start your local redis or setup before proceeding further
+
+For macOS
+
+```bash
+brew services start redis
+```
+
+For Docker
+
+```bash
+docker run -d -p 6379:6379 --name redis-server redis
+```
 
 ## Seeding the Database
 
@@ -144,7 +172,7 @@ Below is an overview of the key models, their relationships, and other architect
      - `description`: String – A brief description of the project.
      - `owner`: ObjectId, ref: 'User', required – The user who owns or created the project (typically an admin).
      - `members`: Array of ObjectIds, ref: 'User' – Users who are members of the project.
-     - `deadline`: Date – The due date for the project.
+     - `deadline`: Date – The due date for the project. DD/MM/YYYY
    - **Relationships**:
      - Each project is created and owned by a user (typically an admin).
      - Multiple users can be members of a project.
@@ -158,7 +186,7 @@ Below is an overview of the key models, their relationships, and other architect
      - `assignedUser`: ObjectId, ref: 'User' – The user responsible for completing the task.
      - `status`: String, enum ('To Do', 'In Progress', 'Completed') – The current status of the task.
      - `priority`: String, enum ('Low', 'Medium', 'High') – The current priority of the task.
-     - `dueDate`: Date – The deadline for the task.
+     - `dueDate`: Date – The deadline for the task. DD/MM/YYYY
      - `project`: ObjectId, ref: 'Project', required – The project to which the task belongs.
    - **Relationships**:
      - Tasks are assigned to a user and belong to a specific project.
@@ -205,15 +233,57 @@ Below is an overview of the key models, their relationships, and other architect
 - **Authorization Middleware**:
   - Ensures that only users with the right roles (e.g., admins) can perform specific actions like creating projects or assigning tasks to other users.
 
-### Security and Scalability
+- **Caching Middleware**:
+  - Checks if a requested resource is already stored in the cache. If it is, the middleware retrieves it from cache and sends it to the client.
+
+### Security
 
 - **Security**:
   - Passwords are hashed using `bcryptjs` before being stored in the database.
   - JWT tokens are used for stateless authentication, and sensitive routes are protected using authorization middleware.
   - Additional security is provided through `helmet` for HTTP header security and `express-rate-limit` to prevent brute-force attacks.
+  - API KEY: For Application
+  - WAF: Config automatic rules, Eg. Block requests from an IP Address.
 
-- **Scalability**:
-  - MongoDB is used as the database, with the potential for horizontal scaling using sharding in production environments.
+### Scaling
+
+- **Google Cloud Run**
+  - Cloud Run scales up or down dynamically based on the **CPU utilization threshold** selected, ensuring efficient use of resources.
+  - Enables autoscaling without the need to manage infrastructure, automatically handling peaks in traffic by creating additional container instances as needed.
+  - **Zero to N Scaling**: Scales down to zero instances when there’s no traffic, minimizing costs during idle times.
+  - **Max Instances**: Can be configured to 
+
+- **Redis Cluster**
+  - Redis can be scaled horizontally by creating a **Redis Cluster**, which partitions data across multiple Redis nodes.
+  - Redis can handle **read scaling** with **replicas** and **write scaling** through **sharding** across multiple nodes.
+
+### Horizontal Scaling Strategies
+
+- **Docker & Containerization**
+
   - The application is containerized using Docker, allowing for easy deployment and scaling across different environments.
+  - Docker containers can be deployed to **Kubernetes clusters** for orchestrating workloads, autoscaling, and load balancing.
+
+- **Database Scaling**
+
+  - **MongoDB** database supports horizontal scaling through **sharding** in production environments.
+  - **Sharding** splits large datasets across multiple servers, enabling the database to handle increased traffic and larger datasets efficiently.
+  - MongoDB replicas can be used for distributing read traffic across multiple nodes, improving read performance as the application scales.
+  - **Redis** for large-scale production use  **clustered configuration**, it supports horizontal scaling to handle increased loads, ensuring low-latency access to cached data.
+
+- **Load Balancing**
+
+- **API Gateway**
+  - Rate limit Requests
+
+- **Microservices**
+  - The architecture can be evolved into a **microservices** model, where services are broken into smaller, independently deployable components.
+  - Each service can be scaled individually based on its demand, improving the flexibility of scaling and resource utilization.
+
+- **Kubernetes**
+  - In the future, the application can be deployed to a **Kubernetes** cluster for even more fine-grained control over scaling and orchestration.
+  - Config..
+  - Kubernetes offers powerful features for **autoscaling**, **self-healing**, and **service discovery**, making it ideal for running complex microservices architectures at scale.
+  - Kubernetes can manage the application at both the container and service level, providing efficient scaling across multiple nodes and cloud regions.
 
 ---
