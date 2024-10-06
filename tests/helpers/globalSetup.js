@@ -17,6 +17,8 @@ module.exports = async () => {
   //JWT Config for Testing
   process.env.JWT_SECRET = 'testsecretsauce';
   process.env.JWT_EXPIRE = '1h';
+  process.env.NODE_ENV = ' test';
+  process.env.USE_REDIS = 'false';
 
   await mongoose.connect(uri);
   await seedDB(usersTestData, projectsTestData, tasksTestData);

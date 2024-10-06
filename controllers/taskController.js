@@ -5,6 +5,7 @@ const Task = require('../models/Task');
 const Project = require('../models/Project');
 const User = require('../models/User');
 const { redisClient } = require('../config/cache');
+const { RootNodesUnavailableError } = require('redis');
 
 // Create Task
 exports.createTask = async (req, res) => {
@@ -64,8 +65,7 @@ exports.createTask = async (req, res) => {
     await task.save();
 
     //Invalidate the cached task list
-    //Invalidate the cached task list
-    if (process.env.NODE_ENV !== 'test') {
+    if (redisClient !== null && process.env.NODE_ENV !== 'test') {
       const redisKeyPattern = 'tasks:*';
       await redisClient.del(redisKeyPattern);
     }
@@ -139,7 +139,7 @@ exports.getTasks = async (req, res) => {
 
 
     // Set-up Cache the result for 1 hour, but skip if NODE_ENV is 'test'
-    if (process.env.NODE_ENV !== 'test') {
+    if (redisClient !== null && process.env.NODE_ENV !== 'test') {
       try {
         await redisClient.setEx(redisKey, 3600, JSON.stringify({ total, page, pages: Math.ceil(total / limit), tasks }));
       } catch (error) {
@@ -273,7 +273,7 @@ exports.updateTask = async (req, res) => {
     await task.save();
 
     //Invalidate the cached task list
-    if (process.env.NODE_ENV !== 'test') {
+    if (redisClient !== null && process.env.NODE_ENV !== 'test') {
       const redisKeyPattern = 'tasks:*';
       await redisClient.del(redisKeyPattern);
     }

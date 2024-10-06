@@ -9,7 +9,7 @@ const redisCache = async (req, res, next) => {
     try {
 
         // Disable for test
-        if (process.env.NODE_ENV === 'test') {
+        if (process.env.NODE_ENV === 'test' || process.env.USE_REDIS === 'false') {
             return next();
         }
 

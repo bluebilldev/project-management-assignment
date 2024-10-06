@@ -3,23 +3,29 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const redisClient = redis.createClient({
-    url: `redis://default:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
-});
+let redisClient = null;
 
-redisClient.on('connect', () => {
-    console.log(`Redis Client Connected`);
-});
+if (process.env.NODE_ENV !== 'test' && process.env.USE_REDIS === 'true') {
+    redisClient = redis.createClient({
+        url: `redis://default:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
+    });
 
-// Handle Redis connection errors
-redisClient.on('error', (err) => {
-    console.log('Redis error:', err);
-});
+    redisClient.on('connect', () => {
+        console.log(`Redis Client Connected`);
+    });
+
+    // Handle Redis connection errors
+    redisClient.on('error', (err) => {
+        console.log('Redis error:', err);
+    });
+} else {
+    console.log('Redis is not initialized for test environment.');
+}
 
 // Reconnect before Get & Set
 const connectRedis = async () => {
     try {
-        if (!redisClient.isOpen || !redisClient.isReady) {
+        if (redisClient && (!redisClient.isOpen || !redisClient.isReady)) {
             await redisClient.connect();
         }
     } catch (error) {
@@ -27,7 +33,7 @@ const connectRedis = async () => {
     }
 };
 
-if (redisClient !== null && process.env.NODE_ENV !== 'test') {
+if (redisClient) {
     connectRedis();
 }
 
