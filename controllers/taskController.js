@@ -64,8 +64,11 @@ exports.createTask = async (req, res) => {
     await task.save();
 
     //Invalidate the cached task list
-    const redisKeyPattern = 'tasks:*';
-    await redisClient.del(redisKeyPattern);
+    //Invalidate the cached task list
+    if (process.env.NODE_ENV !== 'test') {
+      const redisKeyPattern = 'tasks:*';
+      await redisClient.del(redisKeyPattern);
+    }
 
     res.status(201).json(task);
   } catch (error) {
@@ -270,8 +273,10 @@ exports.updateTask = async (req, res) => {
     await task.save();
 
     //Invalidate the cached task list
-    const redisKeyPattern = 'tasks:*';
-    await redisClient.del(redisKeyPattern);
+    if (process.env.NODE_ENV !== 'test') {
+      const redisKeyPattern = 'tasks:*';
+      await redisClient.del(redisKeyPattern);
+    }
 
     res.json(task);
   } catch (error) {
