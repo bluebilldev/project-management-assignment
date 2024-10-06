@@ -3,7 +3,6 @@ const connectDB = require('./config/db');
 const { connectRedis } = require('./config/cache')
 const createServer = require('./utils/app')
 
-
 // Load environment variables
 dotenv.config();
 
@@ -11,7 +10,9 @@ dotenv.config();
 connectDB();
 
 //Connect to Redis
-connectRedis();
+(async () => {
+    await connectRedis();
+  })();
 
 const app = createServer();
 

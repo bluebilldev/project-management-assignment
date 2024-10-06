@@ -11,6 +11,7 @@ const {
 const { createTaskValidation, taskIdValidation, taskQueryValidation, validateRequest } = require('../utils/validators')
 const { protect } = require('../middleware/auth');
 const { isAdmin } = require('../middleware/role');
+const redisCache = require('../middleware/redisCache')
 
 // @route POST /tasks
 router.post('/', protect, createTaskValidation, validateRequest, (req, res) => {
@@ -18,11 +19,11 @@ router.post('/', protect, createTaskValidation, validateRequest, (req, res) => {
 });
 
 // @route   GET /tasks?
-router.get('/', protect, taskQueryValidation, validateRequest, (req, res) => {
+router.get('/', protect, redisCache, taskQueryValidation, validateRequest, (req, res) => {
   getTasks(req, res);
 });
 
-// @route   GET /groupedByUser
+// @route   GET /groupedByUser (ADMIN ONLY)
 router.get('/groupedByUser', protect, isAdmin, getTasksGroupedByUser);
 
 // @route   GET /groupedByUser

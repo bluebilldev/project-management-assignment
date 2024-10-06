@@ -4,6 +4,7 @@ const { ObjectId } = mongoose.Types;
 const Task = require('../models/Task');
 const Project = require('../models/Project');
 const User = require('../models/User');
+const { redisClient } = require('../config/cache');
 
 // Create Task
 exports.createTask = async (req, res) => {
@@ -72,6 +73,9 @@ exports.createTask = async (req, res) => {
 exports.getTasks = async (req, res) => {
   const { page = 1, limit = 10, project, user, status, startDate, endDate, overdue, priority } = req.query;
 
+  // Create a unique Redis key based on the query parameters
+  const redisKey = `tasks:${JSON.stringify(req.query)}:${page}:${limit}`;
+
   try {
 
     // Build the query object based on the optional params
@@ -123,7 +127,19 @@ exports.getTasks = async (req, res) => {
       .skip((parseInt(page) - 1) * parseInt(limit))
       .sort({ dueDate: 1 })
 
-    const total = await Task.countDocuments(query)
+    const total = await Task.countDocuments(query);
+
+
+    // Set-up Cache the result for 1 hour
+    try {
+      await redisClient.setEx(redisKey, 3600, JSON.stringify({ total, page, pages: Math.ceil(total / limit), tasks }));
+    } catch (error) {
+      if (error.message.includes('MISCONF')) {
+        console.warn('Redis write failed due to persistence issue, skipping cache.');
+      } else {
+        console.error('Error caching response:', error);
+      }
+    }
 
     res.json({
       total, page: parseInt(page),
