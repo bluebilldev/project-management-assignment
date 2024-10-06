@@ -60,4 +60,4 @@ jobs:
           --platform managed \
           --region ${{ secrets.GCR_REGION }} \
           --allow-unauthenticated \
-          --set-env-vars NODE_ENV=production,JWT_SECRET=${{ secrets.JWT_SECRET }},JWT_EXPIRE=${{ secrets.JWT_EXPIRE }},MONGO_URI=${{ secrets.MONGO_URI }},PORT=${{ secrets.PORT }},REDIS_HOST=${{ secrets.REDIS_HOST }},REDIS_HOST=${{ secrets.REDIS_PORT }},REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}   
+          --set-env-vars NODE_ENV=production,JWT_SECRET=${{ secrets.JWT_SECRET }},JWT_EXPIRE=${{ secrets.JWT_EXPIRE }},MONGO_URI=${{ secrets.MONGO_URI }},PORT=${{ secrets.PORT }},REDIS_HOST=${{ secrets.REDIS_HOST }},REDIS_PORT=${{ secrets.REDIS_PORT }},REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }},USE_REDIS=true
