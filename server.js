@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const { connectRedis } = require('./config/cache')
 const createServer = require('./utils/app')
 
 
@@ -8,6 +9,9 @@ dotenv.config();
 
 // Connect to database
 connectDB();
+
+//Connect to Redis
+connectRedis();
 
 const app = createServer();
 
