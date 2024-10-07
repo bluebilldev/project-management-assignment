@@ -11,11 +11,6 @@ connectDB();
 
 const app = createServer();
 
-//Health Check Route for Cloud Deployments
-app.get('/health', (req, res) => {
-    res.status(200).send('OK');
-});
-
 
 // Start Server
 const PORT = process.env.PORT || 7000;

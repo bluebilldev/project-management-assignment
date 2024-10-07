@@ -14,7 +14,6 @@
 - [Testing](#testing)
 - [Architecure Overview](#architecture-overview)
 - [Horizontal Scaling Strategies](#horizontal-scaling-strategies)
-- [Deliverables](#deliverables)
 
 ## Introduction
 
@@ -252,7 +251,7 @@ Below is an overview of the key models, their relationships, and other architect
   - Cloud Run scales up or down dynamically based on the **CPU utilization threshold** selected, ensuring efficient use of resources.
   - Enables autoscaling without the need to manage infrastructure, automatically handling peaks in traffic by creating additional container instances as needed.
   - **Zero to N Scaling**: Scales down to zero instances when there’s no traffic, minimizing costs during idle times.
-  - **Max Instances**: Can be configured to
+  - **Max Instances**: Can be configured to limit the number of instances to scale to.
 
 - **Redis Cluster**
   - Redis can be scaled horizontally by creating a **Redis Cluster**, which partitions data across multiple Redis nodes.
@@ -286,15 +285,5 @@ Below is an overview of the key models, their relationships, and other architect
   - Config..
   - Kubernetes offers powerful features for **autoscaling**, **self-healing**, and **service discovery**, making it ideal for running complex microservices architectures at scale.
   - Kubernetes can manage the application at both the container and service level, providing efficient scaling across multiple nodes and cloud regions.
-
-## Deliverables
-
-- **Postman Collection**
-
-<https://grey-satellite-252571.postman.co/workspace/Assignment~068b1172-0f94-4d69-b7b4-980240bbeedf/collection/25714394-d9f02390-9518-46ce-87f0-5b78cd5e91d2?action=share&creator=25714394&active-environment=25714394-d641e2a8-38d9-4910-9179-02ef443ae0ad>
-
-- **Live URL**
-
-  <https://assignment-app-100147389231.asia-south1.run.app>
 
 ---
