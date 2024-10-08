@@ -21,7 +21,8 @@ const createTaskValidation = [
         .exists()
         .withMessage('Please include a valid assigned user id')
         .isMongoId()
-        .withMessage('Invalid user id format')
+        .withMessage('Invalid user id format'),
+    check('label').optional()    
 ];
 
 const taskIdValidation = [

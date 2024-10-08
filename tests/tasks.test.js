@@ -1,17 +1,19 @@
 const supertest = require('supertest')
 const createServer = require('../utils/app')
 const generateToken = require('../utils/generate_token')
-const moment = require('moment');
 const User = require('../models/User')
 const Project = require('../models/Project')
 const Task = require('../models/Task')
+const { parseDate } = require('../utils/date_parser');
+const dayjs = require('dayjs')
 
 const sampleTaskPayload = {
     title: 'Unit Test Task',
     description: 'Add a unit test task to a project',
     dueDate: '09/09/2024',
     status: "To Do",
-    priority: "Medium"
+    priority: "Medium",
+    label: 'Green'
 }
 
 const updateTaskStatusPayload = {
@@ -19,7 +21,7 @@ const updateTaskStatusPayload = {
 }
 
 const updateTaskDueDatePayload = {
-    dueDate: "22/09/24",
+    dueDate: "22/09/2024",
 }
 
 let app,
@@ -84,13 +86,15 @@ describe('Task Test Suite', () => {
             expect(res.body).toHaveProperty('_id');
             expect(res.body).toHaveProperty('title', sampleTaskPayload.title);
             expect(res.body).toHaveProperty('description', sampleTaskPayload.description);
-            expect(moment(res.body.dueDate).format('DD/MM/YYYY')).toEqual(sampleTaskPayload.dueDate);
             expect(res.body).toHaveProperty('assignedUser', user1._id.toString());
             expect(res.body).toHaveProperty('project', projectId1);
             expect(res.body).toHaveProperty('status', sampleTaskPayload.status);
             expect(res.body).toHaveProperty('priority', sampleTaskPayload.priority);
+            expect(res.body).toHaveProperty('label', sampleTaskPayload.label);
             expect(res.body).toHaveProperty('createdAt');
             expect(res.body).toHaveProperty('updatedAt');
+            let payloadDate = parseDate(sampleTaskPayload.dueDate);
+            expect(dayjs.utc(res.body.dueDate).isSame(payloadDate, 'second')).toBe(true);
 
             sampleTaskId = res.body._id.toString();
         });
@@ -416,7 +420,7 @@ describe('Task Test Suite', () => {
 
         it('should list tasks filtered by date range', async () => {
             const res = await supertest(app)
-                .get(`/tasks?startDate=01-10-2024&endDate=30-10-2024`)
+                .get(`/tasks?startDate=01/10/2024&endDate=30/10/2024`)
                 .set('Authorization', `Bearer ${adminToken}`);
 
             expect(res.statusCode).toEqual(200);
@@ -626,9 +630,8 @@ describe('Task Test Suite', () => {
                 .send(updateTaskDueDatePayload)
 
             expect(res.statusCode).toEqual(200);
-            let payloadDate = moment(updateTaskDueDatePayload.dueDate, 'DD-MM-YYYY').utc().format()
-            expect(moment.utc(res.body.dueDate).isSame(moment.utc(payloadDate), 'second')).toBe(true);
-
+            let payloadDate = parseDate(updateTaskDueDatePayload.dueDate);
+            expect(dayjs.utc(res.body.dueDate).isSame(payloadDate, 'second')).toBe(true);
         });
     });
 
@@ -650,8 +653,8 @@ describe('Task Test Suite', () => {
                 .send(updateTaskDueDatePayload)
 
             expect(res.statusCode).toEqual(200);
-            let payloadDate = moment(updateTaskDueDatePayload.dueDate, 'DD-MM-YYYY').utc().format()
-            expect(moment.utc(res.body.dueDate).isSame(moment.utc(payloadDate), 'second')).toBe(true);
+            let payloadDate = parseDate(updateTaskDueDatePayload.dueDate);
+            expect(dayjs.utc(res.body.dueDate).isSame(payloadDate, 'second')).toBe(true);
         });
 
         it('should not update a task due date by user without being assigned', async () => {

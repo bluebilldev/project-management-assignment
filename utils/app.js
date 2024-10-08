@@ -21,7 +21,7 @@ function createServer() {
 
     // Rate Limit HTTP Requests
     const limiter = rateLimit({
-        windowMs: 5 * 60 * 1000, // 5 minutes
+        windowMs: 60 * 1000, // 1 minute
         max: 100, // Limit each IP to 100 requests per windowMs
     });
 

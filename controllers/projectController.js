@@ -1,7 +1,7 @@
-const moment = require('moment');
 const Project = require('../models/Project');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const { parseDate } = require('../utils/date_parser');
 
 // Create Project
 exports.createProject = async (req, res) => {
@@ -11,7 +11,7 @@ exports.createProject = async (req, res) => {
     return res.status(403).json({ message: 'Access denied. Not authorized to create a project' });
   }
 
-  let parsedDeadline = moment(deadline, "DD/MM/YYYY").toDate();
+  let parsedDeadline = parseDate(deadline);
 
   //Check if task already exists with same criteria
   const duplicateProject = await Project.findOne({

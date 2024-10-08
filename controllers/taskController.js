@@ -1,15 +1,15 @@
-const moment = require('moment');
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
 const Task = require('../models/Task');
 const Project = require('../models/Project');
 const User = require('../models/User');
 const { redisClient } = require('../config/cache');
-const { RootNodesUnavailableError } = require('redis');
+const { updateCachedList } = require('../utils/redis')
+const { parseDate } = require('../utils/date_parser')
 
 // Create Task
 exports.createTask = async (req, res) => {
-  const { title, description, status, dueDate, projectId, assignedUser, priority } = req.body;
+  const { title, description, status, dueDate, projectId, assignedUser, priority, label } = req.body;
 
   try {
     const project = await Project.findById(projectId);
@@ -50,7 +50,7 @@ exports.createTask = async (req, res) => {
       return res.status(400).json({ message: 'Task already exists' });
     }
 
-    const parsedDueDate = moment(dueDate, "DD/MM/YYYY").toDate();
+    const parsedDueDate = parseDate(dueDate);
 
     const task = new Task({
       title,
@@ -60,17 +60,18 @@ exports.createTask = async (req, res) => {
       dueDate: parsedDueDate,
       project: projectId,
       assignedUser: taskAssignee,
+      label
     });
 
-    await task.save();
+    const savedTask = await task.save();
 
-    //Invalidate the cached task list
+    //Update the cached task list
     if (redisClient !== null && process.env.NODE_ENV !== 'test') {
       const redisKeyPattern = 'tasks:*';
-      await redisClient.del(redisKeyPattern);
+      await updateCachedList(task._id.toString(), savedTask, redisKeyPattern, 'create');
     }
 
-    res.status(201).json(task);
+    res.status(201).json(savedTask);
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
@@ -79,7 +80,7 @@ exports.createTask = async (req, res) => {
 
 // Get Tasks - Optional Params (by Project, by User, by Status)
 exports.getTasks = async (req, res) => {
-  const { page = 1, limit = 10, project, user, status, startDate, endDate, overdue, priority } = req.query;
+  const { page = 1, limit = 10, project, user, status, startDate, endDate, overdue, priority, label } = req.query;
 
   // Create a unique Redis key based on the query parameters
   const redisKey = `tasks:${JSON.stringify(req.query)}:${page}:${limit}`;
@@ -105,10 +106,16 @@ exports.getTasks = async (req, res) => {
       query.priority = priority;
     }
 
+    if (label) {
+      query.label = label
+    }
+
     if (startDate || endDate) {
-      const parsedStartDate = moment(startDate, "DD/MM/YYYY").toDate();
-      const parsedEndDate = moment(endDate, "DD/MM/YYYY").toDate();
+
+      const parsedStartDate = parseDate(startDate);
+      const parsedEndDate = parseDate(endDate);
       query.createdAt = {};
+
       if (startDate) query.createdAt.$gte = new Date(parsedStartDate);
       if (endDate) query.createdAt.$lte = new Date(parsedEndDate);
     }
@@ -250,7 +257,7 @@ exports.getTasksGroupedByPriority = async (req, res) => {
 // Update Task
 exports.updateTask = async (req, res) => {
   const { id } = req.params;
-  const { title, description, status, dueDate, assignedUser, priority } = req.body;
+  const { title, description, status, dueDate, assignedUser, priority, label } = req.body;
 
   try {
     let task = await Task.findById(id);
@@ -261,21 +268,23 @@ exports.updateTask = async (req, res) => {
       return res.status(403).json({ message: 'Access denied. Not authorized to edit this task' });
     }
 
-    const parsedDueDate = moment(dueDate, "DD/MM/YYYY").toDate();
-
     if (title) task.title = title;
     if (description) task.description = description;
     if (status) task.status = status;
     if (priority) task.priority = priority;
-    if (dueDate) task.dueDate = parsedDueDate;
+    if (dueDate) {
+      let parsedDueDate = parseDate(dueDate);
+      task.dueDate = parsedDueDate
+    }
     if (assignedUser) task.assignedUser = assignedUser;
+    if (label) task.label = label;
 
-    await task.save();
+    const updatedTask = await task.save();
 
-    //Invalidate the cached task list
+    // Update Task in cache list
     if (redisClient !== null && process.env.NODE_ENV !== 'test') {
       const redisKeyPattern = 'tasks:*';
-      await redisClient.del(redisKeyPattern);
+      await updateCachedList(task._id.toString(), updatedTask.toObject(), redisKeyPattern, 'update');
     }
 
     res.json(task);
@@ -298,6 +307,12 @@ exports.deleteTask = async (req, res) => {
     }
 
     await task.deleteOne();
+
+    if (redisClient !== null && process.env.NODE_ENV !== 'test') {
+      const redisKeyPattern = 'tasks:*';
+      await updateCachedList(task._id.toString(), null, redisKeyPattern, 'delete');
+    }
+
     res.json({ message: 'Task removed' });
   } catch (error) {
     console.error(error);

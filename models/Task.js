@@ -17,7 +17,7 @@ const TaskSchema = new mongoose.Schema({
     default: 'Medium',
   },
   dueDate: {
-    type: Date, 
+    type: Date,
     required: true
   },
   assignedUser: {
@@ -29,11 +29,15 @@ const TaskSchema = new mongoose.Schema({
     ref: 'Project',
     required: true,
   },
+  label: {
+    type: String
+  }
 }, { timestamps: true });
 
 // Index for faster queries: Status, Assigned User, Due Date
 TaskSchema.index({ status: 1 });
 TaskSchema.index({ assignedUser: 1 });
 TaskSchema.index({ dueDate: 1 });
+TaskSchema.index({ label: 1 });
 
 module.exports = mongoose.model('Task', TaskSchema);
